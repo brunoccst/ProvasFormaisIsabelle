@@ -1,4 +1,4 @@
-theory TerceiroProblema
+theory ComprimentoDeLista
 imports List
 begin
 primrec tail_len_c_aux::"'a list\<Rightarrow>nat\<Rightarrow>nat"

@@ -1,4 +1,4 @@
-theory Somatorio
+theory Sum
 imports Main
 begin
 
