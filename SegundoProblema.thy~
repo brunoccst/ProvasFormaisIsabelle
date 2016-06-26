@@ -1,5 +1,6 @@
 theory SegundoProblema
 imports Main
+imports complex_main
 begin 
 
 (* Definindo a funcao fataux *)
@@ -34,7 +35,7 @@ show "\<forall>cont. fataux (Suc(Suc m0)) cont = fataux (Suc m0) ((Suc (Suc m0))
 proof (rule allI)
   fix a0::nat
   have "fataux (Suc(Suc m0)) a0 = fataux (Suc m0) ((Suc (Suc m0)) * a0) " by (simp only:fataux02)
-  also have "... = fataux (Suc m0) ((Suc m0) * a0)"
+  also have "... = " by (simp)
   print_state
 
 
