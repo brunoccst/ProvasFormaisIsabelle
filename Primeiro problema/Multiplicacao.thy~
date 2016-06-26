@@ -80,7 +80,7 @@ assume HI:"\<forall>y. mult x0 y = x0 * y"
 show "\<forall>y. mult (Suc x0) y = (Suc x0) * y"
 proof (rule allI)
   fix y0::nat
-  have "mult (Suc x0) y0 = multacc (Suc x0) y0 0" by (simp only: mult01)
+  have "mult (Suc x0) y0 = multacc (Suc x0) y0 0" by (simp)
   also have "... = multacc x0 y0 (0 + y0)" by (simp only: multacc02)
   also have "... = multacc x0 y0 y0" by (simp)
   also have "... = x0 * y0 + y0" by (simp add: th01)
@@ -88,7 +88,7 @@ proof (rule allI)
   also have "... = (y0 * x0) + (y0 * 1)" by (algebra)
   also have "... = y0 * (x0 + 1)" by (algebra)
   also have "... = (x0 + 1) * y0" by (algebra)
-  also have "... = (Suc x0) * y0" by (simp)           
+  also have "... = (Suc x0) * y0" by (simp)
   finally show "mult (Suc x0) y0 = (Suc x0) * y0" by (simp)
 qed
 qed

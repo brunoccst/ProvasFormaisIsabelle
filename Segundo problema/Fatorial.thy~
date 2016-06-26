@@ -25,10 +25,12 @@ proof(induct n)
 show "\<forall>cont. fataux 0 cont = factorial 0 * cont"
 proof (rule allI)
   fix cont0::nat  
-  have "fataux 0 cont0 = cont0" by (simp only:fataux01)
+  have "fataux (Suc 0) cont0 = fataux 0 ((Suc 0) * cont0 )  " by (simp only:fataux02)
+  also have "... = ((Suc 0) * cont0) " by (simp only:fataux01)
+  also have "... = cont0" by arith
   also have "... = 1 * cont0" by arith
-  finally show "fataux 0 cont0 = factorial 0 * cont0" by (simp only: factorial01)
-qed 
+  finally show "fataux 0 cont0 = factorial 0 * cont0" by simp
+qed
 
 (* Continuando a prova pelo segundo subgoal - provar para n+1 *)
 next
@@ -65,7 +67,8 @@ proof(induct n)
 show "\<forall>cont. fat 0 = factorial 0"
 proof (rule allI)
   fix cont0::nat
-  have "fat 0 = 1" by (simp only: fat01)
+  have "fat 0 = fataux 0 1" by (simp)
+  also have "... = 1" by (simp)
   also have "... = factorial 0" by (simp add: th01)
   finally show "fat 0 = factorial 0" by (simp add: th01)
 qed
@@ -77,7 +80,7 @@ assume HI:"\<forall>cont. fat m0 = factorial m0"
 show "\<forall>cont. fat (Suc m0) = factorial (Suc m0)"
 proof (rule allI)
   fix cont0::nat
-  have "fat (Suc m0) = fataux (Suc m0) 1" by (simp only: fat02)
+  have "fat (Suc m0) = fataux (Suc m0) 1" by simp
   also have "... = factorial (Suc m0) * 1" by (simp add: th01)
   also have "... = factorial (Suc m0)" by arith
   finally show "fat (Suc m0) = factorial (Suc m0)" by arith
