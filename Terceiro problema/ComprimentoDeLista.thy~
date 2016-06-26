@@ -36,11 +36,11 @@ proof(induct l)
 qed
 next
 fix l0::"'a list" and e::'a
-assume HI: "tail_len_nc l0 = length l0"
+assume rec_nao_cald_hi: "tail_len_nc l0 = length l0"
 	show"tail_len_nc (e#l0) = length (e#l0)"
 	proof -
 	have"tail_len_nc (e#l0) = tail_len_nc l0 + 1" by(simp only:tail_len_nc02)
-	also have"... = length l0 + 1" by(simp only:HI)
+	also have"... = length l0 + 1" by(simp only:rec_nao_cald_hi)
 	also have"... = length (e#l0)" by(simp)
 	finally show"tail_len_nc (e#l0) = length (e#l0)" by(simp)
 qed
@@ -58,19 +58,19 @@ proof(induction l)
 qed
 next
 fix l0::"'a list" and elem::'a
-assume HI:"\<forall>a. tail_len_c_aux l0 a = length l0 + a"
+assume rec_cald_inv_hi:"\<forall>a. tail_len_c_aux l0 a = length l0 + a"
 	show"\<forall>a. tail_len_c_aux (elem#l0) a = length (elem#l0) + a"
 	proof (rule allI)
 	fix a0::nat
 	have"tail_len_c_aux (elem#l0) a0 = tail_len_c_aux l0 (Suc a0)" by(simp only:tail_len_c_aux02)
-	also have"... = length l0 + (Suc a0)" by(simp only:HI)
-	also have"... = length (elem#l0) + a0" by (simp)
+	also have"... = length l0 + (Suc a0)" by(simp only:rec_cald_inv_hi)
+	also have"... = length (elem#l0) + a0" by(simp)
 	finally show"tail_len_c_aux (elem#l0) a0 = length (elem#l0) + a0" by(simp)
 qed
 qed
 
 (* Provando que a funcao recursiva na cauda eh igual a nao recursiva na cauda *)
-theorem th03: "tail_len_nc T = tail_len_c T"
+theorem tail_len_equi: "tail_len_nc T = tail_len_c T"
 proof(induct T)
 
 (* Provando para o caso base *)
