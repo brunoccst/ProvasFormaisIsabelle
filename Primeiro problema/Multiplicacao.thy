@@ -1,4 +1,4 @@
-theory PrimeiroProblema
+theory Multiplicacao
 imports Main
 begin
 
