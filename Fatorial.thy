@@ -1,4 +1,4 @@
-theory SegundoProblema
+theory Fatorial
 imports Complex_Main
 begin 
 
