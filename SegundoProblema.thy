@@ -60,7 +60,7 @@ fun fat::"nat \<Rightarrow> nat"
 value "fat 3"
 
 (* Provando fataux *)
-theorem fat:"\<forall>cont. fat n = factorial n"
+theorem th02:"\<forall>cont. fat n = factorial n"
 proof(induct n)
 
 (* Iniciando a prova pelo primeiro subgoal - provar para caso base *)
@@ -80,8 +80,14 @@ assume HI:"\<forall>cont. fat m0 = factorial m0"
 show "\<forall>cont. fat (Suc m0) = factorial (Suc m0)"
 proof (rule allI)
   fix cont0::nat
-  have "fat (Suc m0) = fataux (Suc m0) cont0"
-  also have "... = "
+  have "fat (Suc m0) = fataux (Suc m0) 1" by simp
+  also have "... = factorial (Suc m0) * 1" by (simp add: th01)
+  also have "... = factorial (Suc m0)" by arith
+  finally show "fat (Suc m0) = factorial (Suc m0)" by arith
+qed
+qed
+
+end
   
   
   
