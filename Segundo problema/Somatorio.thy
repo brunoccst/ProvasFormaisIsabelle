@@ -2,47 +2,75 @@ theory Somatorio
 imports Main
 begin
 
-(* Definindo a funcao recursiva na cauda sumaux *)
-primrec sumaux:: "nat \<Rightarrow> nat \<Rightarrow> nat"
+(* Definindo a funcao recursiva na cauda somaux *)
+primrec somaux::"nat \<Rightarrow> nat \<Rightarrow> nat"
   where
-    sumaux01: "sumaux 0 a = a" |
-    sumaux02: "sumaux (Suc n) a = sumaux n (((Suc n)^2) + a)"
+    somaux01:"somaux 0 cont = cont" |
+    somaux02:"somaux (Suc n) cont = somaux n (( (Suc n) * (Suc n) ) + cont)"
 
-(* Testando valores em sumaux *)
-value "sumaux 0 2"
-value "sumaux 1 2"
-value "sumaux 2 2"
+(* Definindo a funcao nao recursiva na cauda somatorio *)
+fun somatorio::"nat \<Rightarrow> nat" where
+	somatorio01:"somatorio n = somaux n 0"
 
-(* Provando funcao sumaux  *)
-theorem th01:"\<forall>a. sumaux n a = sumaux n (((Suc n)^2) + a)"
-proof(induct n)
+(* Testando a funcao somatorio *)
+value "somatorio 3"
 
-(* Iniciando a prova pelo primeiro subgoal - provar para caso base *)
-show "\<forall>a. sumaux 0 a = 0 div 6 * (0 + 1) * (2 * 0 + 1)"
-proof (rule allI)
-  fix a0::nat  
-  have "sumaux 0 a0 = a0" by (simp only: sumaux01)
-  also have "... = "
+(* Provando o teorema com invariante *)
+theorem th01:"\<forall>a. somaux n a = (\<Sum>i=1..n. i*i) + a"
+apply(induction n)
+apply(simp)
+apply(simp)
+done
 
+(* Provando o teorema para somaux *)
+theorem th02:"\<forall>a. somaux n a = (\<Sum>i=1..n. i*i) + a"
+proof(induction n)
 
+(* Provando para o caso base *)
+show"\<forall>a. somaux 0 a = (\<Sum>i=1..0. i*i) + a"
+proof(rule allI)
+  fix a0::nat
+  have "somaux 0 a0 = a0" by(simp only:somaux01)
+  also have "... = (\<Sum>i=1..0. i*i) + a0" by (simp)
+  finally show "somaux 0 a0 = (\<Sum>i=1..0. i*i) + a0" by (simp)
+qed
 
-(*
-fun sum:: "nat \<Rightarrow> nat"
-  where
-    sum01: "sum 0 = 0" |
-    sum02: "sum (Suc(n)) = Suc(n) * Suc(n) + sum(n)"
+(* Provando para n + 1 *)
+next
+fix x0::nat
+assume HI:"\<forall>a. somaux x0 a = (\<Sum>i=1..x0. i*i) + a"
+show"\<forall>a. somaux (Suc x0) a = (\<Sum>i=1..(Suc x0). i*i) + a"
+proof(rule allI)
+  fix a0::nat
+  have "somaux (Suc x0) a0 = somaux x0 ((Suc x0)*(Suc x0)+a0)" by (simp only:somaux02)
+  also have "... = (\<Sum>i=1..x0. i*i) + (Suc x0)*(Suc x0)+a0" by (simp only:HI)
+  also have "... = (\<Sum>i=1..(Suc x0). i*i) + a0" by (simp)
+  finally show "somaux (Suc x0) a0 =(\<Sum>i=1..(Suc x0). i*i) + a0" by (simp)
+qed
+qed
 
-theorem th_sum:"sum(n) =  n div 6 * (n+1)*(2*n+1)"
-proof(induct n)
-have "sum(0) = 0" by  (simp only:sum01)
-also have "... = 0 div 6 * (0+1)*(2*0+1)" by arith
-finally show "sum(0) = 0 div 6 * (0+1)*(2*0+1)" by simp
+(* Provando teorema para somatorio *)
+theorem th03:"somatorio n = (\<Sum>i=1..n. i*i)"
+proof(induction n)
+
+(*  Provando para o caso base *)
+show"somatorio 0 = (\<Sum>i=1..0. i*i)"
+proof -
+  have "somatorio 0 = somaux 0 0" by (simp only:somatorio01)
+  also have "... = 0" by (simp only:somaux01)
+  finally show "somatorio 0 = (\<Sum>i=1..0. i*i)" by(simp)
+qed
+
+(* Provando para n + 1 *)
 next
 fix n0::nat
-assume HI:"sum(n0) = n0 div 6 * (n0+1)*(2*n0+1)"
-show "sum(Suc n0) = (Suc n0) div 6 * ((Suc n0) + 1)*(2*(Suc n0)+1)"
+assume HI: "somatorio n0 = (\<Sum>i=1..n0. i*i)"
+show"somatorio (Suc n0) = (\<Sum>i=1..(Suc n0). i*i)"
 proof -
-have "sum(Suc n0) =  Suc(n0)*Suc(n0) + sum(n0)" by (simp only:sum02)
-also have "... = "
+  have "somatorio (Suc n0) = somaux (Suc n0) 0" by (simp only:somatorio01)
+  also have "... = (\<Sum>i=1..(Suc n0). i*i) + 0" by (simp only:th01)
+  finally show "somatorio (Suc n0) = (\<Sum>i=1..(Suc n0). i*i)" by(simp)
 qed
-*)
+qed
+
+end

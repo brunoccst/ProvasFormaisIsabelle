@@ -14,7 +14,7 @@ value "sumaux 1 2"
 value "sumaux 2 2"
 
 (* Provando funcao sumaux  *)
-theorem th01:"\<forall>a. sumaux n a = (n div 6) * (n + 1) * (2 * n + 1)"
+theorem th01:"\<forall>a. sumaux n a = sumaux n (((Suc n)^2) + a)"
 proof(induct n)
 
 (* Iniciando a prova pelo primeiro subgoal - provar para caso base *)
@@ -26,8 +26,7 @@ proof (rule allI)
 
 
 
-
-
+(*
 fun sum:: "nat \<Rightarrow> nat"
   where
     sum01: "sum 0 = 0" |
@@ -46,22 +45,4 @@ proof -
 have "sum(Suc n0) =  Suc(n0)*Suc(n0) + sum(n0)" by (simp only:sum02)
 also have "... = "
 qed
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
+*)
