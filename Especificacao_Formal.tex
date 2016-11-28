@@ -1,0 +1,422 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Especificação de algoritmos com Isabelle}
+\author {Bruno Carvalho, Guilherme Schmitt, Henri Dias,
+\\João Fanti, Matheus Santos}
+\date{Junho de 2016}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amssymb}
+
+\begin{document}
+
+\maketitle
+
+\section{Primeiro problema}
+\subsection{Especificação}
+\textbf{mult}: N x N $\rightarrow$ N
+\\requer~T
+\\garante mult(x,y)= x * y
+\\mult(x,y) = multacc(x,y,0)
+\\\textit{onde}
+\\
+\textbf{multacc}: N x N x N $\rightarrow$ N
+\\requer T
+\\garante multacc(x,y,z) = x * y + z
+\\invariante $\forall$k $\in$ N.  multacc(m0,n0,a0) = mk * nk + ak
+\\\textit{multacc01}: multacc(0,n,a) = a
+\\\textit{multacc02}: multacc(k+1,n,a) = multacc(k,n,a + n)
+
+\subsection{Exemplo de execução}
+mult(2, 3)
+\\= multacc(2, 3, 0)
+\\= multacc(1, 3, (0+3))
+\\= multacc(0, 3, (3+3))
+\\= 6
+
+\subsection{Teorema th01: multacc(x,y,z) = x * y + z}
+P $\triangleq$ $\forall$ x,y,z $\in$ N. multacc(x,y,z) = x * y + z
+\\P(x) $\triangleq$ $\forall$ y,z $\in$ N. multacc(x,y,z) = x * y + z
+\\
+\\\subsubsection{Base:} P(0) $\triangleq$ $\forall$ y,z $\in$ N. multacc(0,y,z) = 0 * y + z
+\\
+\\Seja y0 uma variável arbitrária 
+\\Seja a0 uma variável arbitrária 
+\\Mostrar multacc(0,y0,a0) = 0 * y0 + a0
+\\
+\\\textit{Prova:}
+\\multacc(0,y0,a0) (por definição)
+\\0 * y0 + a0 (por simp)
+\\a0 (por multacc01)
+\\(0 * y0) + a0 (por aritmética)
+\\0 * y0 + a0 (por simplificação)
+\\
+\\\subsubsection{Indução:}
+Seja x0 uma variável arbitrária
+\\Assumir como hipótese P(x0) $\triangleq$ $\forall$ y,z $\in$ N. multacc(x0,y,z) = x0 * y + z
+\\Demonstrar P(x0 + 1) $\triangleq$ $\forall$y,z $\in$ N. multacc(x0 + 1,y,z) = (x0 + 1) * y + z
+\\
+\\Seja y0 uma variável arbitrária 
+\\Seja a0 uma variável arbitrária 
+\\Mostrar multacc(x0 + 1,y0,a0) = (x0 + 1) * y0 + a0
+\\
+\\\textit{Prova:}
+\\multacc x0 y0 (a0 + y0) (por multacc02)
+\\x0 * y0 + (a0 + y0) (por hipótese) 
+\\x0 * y0 + a0 + y0 (por aritmética)
+\\(x0 * y0) + (y0 * 1) + a0 (por álgebra)
+\\(y0 * x0) + (y0 * 1) + a0 (por álgebra)
+\\y0 * (x0 + 1) + a0 (por álgebra)
+\\(x0 + 1) * y0 + a0 (por álgebra)
+
+\subsection{Teorema th02: mult(x,y) = x * y}
+P $\triangleq$ $\forall$x,y $\in$ N. mult(x,y) = x * y
+\\P(x) $\triangleq$ $\forall$y $\in$ N. mult(x,y) = x * y
+\\
+\\\subsubsection{Base:} P(0) $\triangleq$ $\forall$y $\in$ N. mult(0,y) = 0 * y
+\\
+\\Seja y0 uma variável arbitrária
+\\Mostrar mult(0,y0) = 0 * y0
+\\
+\\\textit{Prova:}
+\\multacc 0 y0 0 (por mult01)
+\\0 (por multacc01)
+\\0 * y0 (por aritmética)
+\\
+\\\subsubsection{Indução:}
+Seja x0 uma variável arbitrária
+\\Assumir como hipótese P(x0) $\triangleq$ $\forall$y $\in$ N. mult(x0,y) = x0 * y
+\\Demonstrar P(x0 + 1) $\triangleq$ $\forall$y $\in$ N. mult(x0 + 1,y) = (x0 + 1) * y
+\\
+\\Seja y0 uma variável arbitrária
+\\Mostrar mult(x0 + 1,y0) = (x0 + 1) * y0
+\\
+\\\textit{Prova:}
+\\mult (Suc x0) y0 (por simplificação)
+\\multacc (Suc x0) y0 0 (por mult01)
+\\multacc x0 y0 (0 + y0) (por multacc02)
+\\multacc x0 y0 y0 (por simplificação)
+\\x0 * y0 + y0 (por th01)
+\\y0 * x0 + y0 (por algebra)
+\\(y0 * x0) + (y0 * 1) (por algebra)
+\\y0 * (x0 + 1) (por algebra)
+\\(x0 + 1) * y0 (por algebra)
+\\(Suc x0) * y0 (por simplificação)     
+
+\section{Segundo problema}
+
+\subsection{Fatorial}
+
+\subsubsection{Especificação}
+\textbf{fat}: N x N $\rightarrow$ N
+\\requer x $\ge$ 0
+\\garante fat(x) = x!
+\\fat(x) = fataux(x,1)
+\\onde
+\\fataux: N x N $\rightarrow$ N
+\\requer x $\ge$ 0
+\\garante fataux(x,y) = x! * y
+\\invariante $\forall$k $\in$ N. fataux(m0,n0) = mk! * nk
+\\\textit{fataux01}: fataux 0 a = a
+\\\textit{fataux02}: fataux(n,a) = fataux((n - 1), (a * n)), se n > 0
+
+\subsubsection{Exemplo de execução}
+fat(3)
+\\= fataux (3, 1)
+\\= fataux(2, (1 * 3))
+\\= fataux(1, ((1 * 3) * 2))
+\\= fataux(0, (((1 * 3) * 2) * 1))
+\\= (((1 * 3) * 2) * 1)
+\\= ((3 * 2) * 1)
+\\= (6 * 1)
+\\= 6
+
+\subsubsection{Teorema th01: $\forall$cont. fataux n cont = n! * cont}
+P $\triangleq$ $\forall$x,y $\in$ N. fataux(x,y) = x! * y
+\\P(x) $\triangleq$ $\forall$y $\in$ N. fataux(x,y) = x! * y
+\\
+\\\textbf{Base}: P(0) $\triangleq$ $\forall$ y $\in$ N. fataux(0,y) = 0! * y
+\\
+\\Seja cont0 uma variável arbitrária 
+\\Mostrar fataux(0, cont0) = 0! * cont0
+\\
+\\\textit{Prova:}
+\\cont0 (por fataux01)
+\\1 * cont0 (por aritmética)
+\\0! * cont0 (por fatorial)
+\\
+\\\textbf{Indução}:
+\\Seja m0 uma variável arbitrária
+\\Assumir como hipótese P(m0) $\triangleq$ $\forall$y $\in$ N. fataux(m0,y) = m0! * y
+\\Demonstrar P(m0 + 1) $\triangleq$ $\forall$y $\in$ N. fataux(x0 + 1,y) = (x0 + 1)! * y
+\\
+\\Seja a0 uma variável arbitrária 
+\\Mostrar fataux(m0 + 1, a0) = (m0 + 1)! * a0
+\\
+\\\textit{Prova:}
+\\fataux (Suc m0) a0 (por simplificação)
+\\fataux m0 ((Suc m0) * a0) (por fataux02) 
+\\m0! * ((Suc m0) * a0) (por hipótese)
+\\m0! * (Suc m0) * a0 (por aritmética)
+\\(Suc m0)! * a0 (por simplificação)
+\\(m0 + 1)! * a0 (por simplificação)
+
+\subsubsection{Teorema th02: fat n = n!}
+P $\triangleq$ $\forall$x $\in$ N. fat(x) = x!
+\\P(x) $\triangleq$ fat(x) = x!
+\\
+\\\textbf{Base}: P(0) $\triangleq$ fat(0) = 0!
+\\Mostrar fat(0) = 0!
+\\
+\\\textit{Prova:}
+\\1 (por fat01)
+\\0! (por th01)
+\\
+\\\textbf{Indução}:
+\\Seja m0 uma variável arbitrária
+\\Assumir como hipótese P(m0) $\triangleq$ fat(m0) = m0!
+\\Demonstrar P(m0 + 1) $\triangleq$ fat(m0 + 1) = (m0 + 1)!
+\\
+\\Mostrar fat(m0 + 1) = (m0 + 1)!
+\\
+\\\textit{Prova:}
+\\fat (Suc m0) (por simplificação)
+\\fataux (Suc m0) 1 (por fat02)
+\\(Suc m0)! * 1 (por th01)
+\\(Suc m0)! (por aritmética)
+\\(m0 + 1)! (por simplificação)
+
+\subsection{Somatório}
+\subsubsection{Especificação}
+\textbf{somatorio}: N $\rightarrow$ N 
+\\requer: x $\ge$ 0
+\\garante somatorio(n) = $$\sum_{i=1}^{n} i^{2} = (n/6) * (n + 1) * (2 * n + 1)$$ 
+\\somatorio(n) = sumaux(n,0)
+\\onde
+\\\textbf{sumaux}: N x N $\rightarrow$ N
+\\requer x $\ge$ 0
+\\garante sumaux(n,t) = $$\sum_{i=1}^{n} i^{2} + t$$ 
+\\invariante $\forall$k $\in$ N. sumaux(w0,u0) = $$\sum_{i=1}^{wk} i^{2} + uk$$ 
+\\sumaux01: sumaux(0,a) = a
+\\sumaux02: sumaux(n,a) = sumaux(n - 1,n$^{2}$ + a), se n $\textgreater$ 0
+
+\subsubsection{Exemplo de execução}
+somatorio(4) 
+\\= sumaux(4,0)
+\\= sumaux(3,4 * 4 + 0)
+\\= sumaux(2,3 * 3 + 4 * 4 + 0)
+\\= sumaux(1,2 * 2 + 3 * 3 + 4 * 4 + 0)
+\\= sumaux(0,1 * 1 + 2 * 2 + 3 * 3 + 4 * 4 + 0)
+\\= 1 * 1 + 2 * 2 + 3 * 3 + 4 * 4 + 0
+\\= 30
+
+\subsubsection{Teorema th01: $$\sum_{i=1}^{n} i^{2} = (n/6) * (n + 1) * (2 * n + 1)$$ }
+P $\triangleq$ $\forall$n $\in$ N. $$\sum_{i=1}^{n} i^{2} = (n/6) * (n + 1) * (2 * n + 1)$$
+\\P(n) $\triangleq$ $$\sum_{i=1}^{n} i^{2} = (n/6) * (n + 1) * (2 * n + 1)$$
+\\
+\textbf{Base:}
+\\P(0) $\triangleq$ $$\sum_{i=1}^{0} i^{2} = (0/6) * (0 + 1) * (2 * 0 + 1)$$
+\\
+\\Mostrar $$\sum_{i=1}^{0} i^{2} = (0/6) * (0 + 1) * (2 * 0 + 1)$$
+\\\textit{Prova:}
+\\0 (por aritmética)
+\\ (n/6) * (n + 1) * (2 * n + 1) (por aritmética)
+\\
+\\
+\textbf{Indução:}
+Seja n0 uma variável arbitrária
+\\Assumir como hipótese P(n0) $\triangleq$ $$\sum_{i=1}^{n0} i^{2} = (n0/6) * (n0 + 1) * (2 * n0 + 1)$$
+\\Demonstrar P(n0 + 1) $\triangleq$ $$\sum_{i=1}^{n0 + 1} i^{2} = (n0 + 1/6) * (n0 + 1 + 1) * (2 * (n0 + 1) + 1)$$
+\\Mostrar $$\sum_{i=1}^{n0 + 1} i^{2} = (n0 + 1/6) * (n0 + 1 + 1) * (2 * (n0 + 1) + 1)$$
+\\\textit{Prova:}
+\\$$\sum_{i=1}^{n0 + 1} i^{2} + (n0 + 1)^{2}$$ (por aritmética)
+\\(n0/6) * (n0 + 1) * (2 * n0 + 1) + (n0 + 1)$^{2}$ (por hipótese)
+\\((n0 + 1)/6) * (n0 + 2) * (2 * (n0 + 1) + 1) (por aritmética)
+
+
+\subsubsection{Teorema th02: sumaux(n, t) = $$\sum_{i=1}^{n} i^{2} + t$$}
+P $\triangleq$ $\forall$n,t $\in$ N. sumaux(n,t) = $$\sum_{i=1}^{n} i^{2} + t$$
+\\P(n) $\triangleq$ $\forall$t $\in$ N. sumaux(n,t) = $$\sum_{i=1}^{n} i^{2} + t$$
+\\
+\\\textbf{Base:}
+\\P(0) $\triangleq$ $\forall$t $\in$ N. sumaux(0,t) = $$\sum_{i=1}^{0} i^{2} + t$$
+\\
+\\\textit{Prova:}
+\\Seja t0 uma variável arbitrária
+\\Mostrar sumaux(0,t0) = $$\sum_{i=1}^{0} i^{2} + t0$$
+\\t0 (por sumaux01)
+\\i=$$\sum_{i=1}^{0} i^{2} + t0$$ (por aritmética)
+\\
+\\\textbf{Indução:}
+\\Seja n0 uma variável arbitrária
+\\Assumir como hipótese \\P(n0) $\triangleq$ $\forall$t $\in$ N. sumaux(n0,t) = $$\sum_{i=1}^{n0} i^{2} + t$$
+\\Demonstrar \\P(n0 + 1) $\triangleq$ $\forall$t $\in$ N. sumaux(n0 + 1,t) = $$\sum_{i=1}^{n0 + 1} i^{2} + t$$
+\\
+\\\textit{Prova:}
+\\Seja t0 uma variável arbitrária 
+\\Mostrar sumaux(n0 + 1,t0) = $$\sum_{i=1}^{n0 + 1} i^{2} + t0$$
+\\sumaux(n0,(n0 + 1)$^{2}$ + t0) (por sumaux02)
+\\$$\sum_{i=1}^{n0 + 1} (n0 + 1)^{2} + t0$$ (por hipótese)
+\\$$\sum_{i=1}^{n0 + 1} i^{2} + t0$$ (por aritmética)
+
+\subsubsection{Teorema th03: somatorio(n) = $$\sum_{i=1}^{n} i^{2}$$}
+P $\triangleq$ $\forall$n $\in$ N. somatorio(n) = $$\sum_{i=1}^{n} i^{2}$$
+\\P(n) $\triangleq$ $\forall$n $\in$ N. somatorio(n) = $$\sum_{i=1}^{n} i^{2}$$
+\\
+\\\textbf{Base:}
+\\P(0) $\triangleq$ $\forall$n $\in$ N. somatorio(0) = $$\sum_{i=1}^{0} i^{2}$$
+\\
+\\\textit{Prova:}
+\\Mostrar somatorio(0) = $$\sum_{i=1}^{0} i^{2}$$
+\\sumaux(0,0) (por definição)
+\\0 (por definição)
+\\$$\sum_{i=1}^{0} i^{2}$$ (por aritmética)
+\\
+\\\textbf{Indução:}
+\\Seja n0 uma variável arbitrária
+\\Assumir como hipótese P(n0) $\triangleq$ somatorio(n0) = $$\sum_{i=1}^{n0} i^{2}$$
+\\Demonstrar P(n0 + 1) $\triangleq$ somatorio(n0 + 1) = $$\sum_{i=1}^{n0 + 1} i^{2}$$
+\\
+\\\textit{Prova:}
+\\Mostrar somatorio(n0 + 1) = $$\sum_{i=1}^{n0 + 1} i^{2}$$
+\\sumaux(n0 + 1,0) (por definição)
+\\sumaux(n0,(n0 + 1)$^{2}$ + 0) (por definição)
+\\$$\sum_{i=1}^{n0} (n0 + 1)^{2} + 0$$ (por definição da invariante sumaux)
+\\$$\sum_{i=1}^{n0 + 1} i^{2}$$(por aritmética)
+\\
+\subsubsection{Teorema: sum(n) = (n/6) * (n + 1) * (2 * n + 1)}
+P $\triangleq$ $\forall$n $\in$ N. sum(n) = (n/6) * (n + 1) * (2 * n + 1)
+\\P(n) $\triangleq$ $\forall$n $\in$ N sum(n) = (n/6) * (n + 1) * (2 * n + 1)
+\\
+\\\textbf{Base:}
+\\P(0) $\triangleq$ sum(0) = (0/6) * (0 + 1) * (2 * 0 + 1) 
+\\
+\\\textit{Prova:}
+\\Mostrar sum(0) = (0/6) * (0 + 1) * (2 * 0 + 1) 
+\\sumaux(0,0) (por definição)
+\\0 (por definição)
+\\(0/6) * (0 + 1) * (2 * 0 + 1) (por aritmética)
+\\
+\\\textbf{Indução:}
+\\Seja n0 uma variável arbitrária
+\\Assumir como hipótese P(n0) $\triangleq$ sum(n0) = (n0/6) * (n0 + 1) * (2 * n0 + 1)
+\\Demonstrar P(n0 + 1) $\triangleq$ sum(n0 + 1) = ((n0 + 1)/6) * (n0 + 2) * (2 * (n0 + 1) + 1)
+\\
+\\\textit{Prova:}
+\\Mostrar sum(n0 + 1) = ((n0 + 1)/6) * (n0 + 2) * (2 * (n0 + 1) + 1)
+\\sumaux(n0 + 1,0) (por definição)
+\\sumaux(n0,(n0 + 1)$^{2}$ + 0) (por definição)
+\\$$\sum_{i=1}^{n0} i^{2} + (n0 + 1)^{2} + 0$$ (por definição da invariante sumaux)
+\\sum(n0) + (n0 + 1)$^{2}$ (por definição sum(n) = $$\sum_{i=1}^{n0} i^{2}$$)
+\\(n0/6) * (n0 + 1) * (2 * n0 + 1) + (n0 + 1)$^{2}$ (por hipótese)
+\\((n0 + 1)/6) * (n0 + 2) * (2 * (n0 + 1) + 1) (por aritmética)
+
+\section{Terceiro problema}
+\subsection{Especificação recursiva na cauda}
+\textbf{tail\_len\_c}: List $\rightarrow$ N
+\\requer L
+\\garante tail\_len\_c L = length L
+\\\textit{tail\_len\_c01}: tail\_len\_c [] = 0
+\\\textit{tail\_len\_c02}: tail\_len\_c T = tail\_len\_c\_aux T 0
+\\\textit{onde}
+\\
+\textbf{tail\_len\_c\_aux}: List x N $\rightarrow$ N
+\\requer L
+\\\textit{tail\_len\_c\_aux01}: tail\_len\_c\_aux [] a = a
+\\\textit{tail\_len\_c\_aux02}: tail\_len\_c\_aux (h\#T) a = tail\_len\_c\_aux T (Suc(a))
+
+\subsubsection{Exemplo de execução}
+tail\_len\_c [4, 7]
+\\= tail\_len\_c\_aux [4, 7] 0
+\\= tail\_len\_c\_aux [7] 1
+\\= tail\_len\_c\_aux [] 2
+\\= 2
+
+\subsection{Especificação não recursiva na cauda}
+\textbf{tail\_len\_nc}: List $\rightarrow$ N
+\\requer L
+\\garante tail\_len\_nc L = length L
+\textit{tail\_len\_nc01}: tail\_len\_nc [] = 0
+\textit{tail\_len\_nc02}: tail\_len\_nc (h\#T) = 1 + tail\_len\_nc T
+
+\subsubsection{Exemplo de execução}
+tail\_len\_nc [4, 5]
+\\= tail\_len\_nc (1 + tail\_len\_nc [5])
+\\= 1 + (tail\_len\_nc (1 + tail\_len\_nc []))
+\\= (1 + 1 + 0)
+\\= (2 + 0)
+\\= 2
+
+\subsection{Teorema th01: tail\_len\_nc l = length l}
+P $\triangleq$ tail\_len\_nc l = length l
+\\P(l) $\triangleq$ tail\_len\_nc l = length l
+\\
+\\\subsubsection{Base:} P([]) $\triangleq$ tail\_len\_nc
+\\
+\\Mostrar tail\_len\_nc [] = length []
+\\
+\\\textit{Prova:}
+\\tail\_len\_nc [] = 0 (por tail\_len\_nc01)
+\\length [] (por simplificação)
+\\
+\\\subsubsection{Indução:}
+Seja l0 uma variável arbitrária
+\\Seja \textit{e} uma variável arbitrária
+\\Assumir como hipótese P(l0) $\triangleq$ tail\_len\_nc l0 = length l0
+\\Demonstrar P(e\#l0) $\triangleq$ tail\_len\_nc (e\#l0) = length (e\#l0)
+\\
+\\\textit{Prova:}
+\\tail\_len\_nc l0 + 1 (por tail\_len\_nc02)
+\\length l0 + 1 (por hipótese)
+\\length (e\#l0) (por simplificação)
+
+\subsection{Teorema th02: $\forall$a. tail\_len\_c\_aux l a = length l + a}
+P $\triangleq$ $\forall$a $\in$ N. tail\_len\_c\_aux l a = length l + a
+\\P(l) $\triangleq$ $\forall$a $\in$ N. tail\_len\_c\_aux l a = length l + a
+\\
+\\\subsubsection{Base:} P([]) $\triangleq$ $\forall$a $\in$ N. tail\_len\_c [] a = length [] + a
+\\Seja a0 uma variável arbitrária
+\\Mostrar tail\_len\_c\_aux [] a0 = length [] + a0
+\\
+\\\textit{Prova:}
+\\a0 (por tail\_len\_c\_aux01)
+\\length [] + a0 (por simplificação)
+\\
+\\\subsubsection{Indução:}
+Seja l0 uma variável arbitrária
+\\Seja \textit{elem} uma variável arbitrária
+\\Assumir como hipótese P(l0) $\triangleq$ $\forall$a. tail\_len\_c\_aux l0 a = length l0 + a
+\\Demonstrar P(elem\#l0) $\triangleq$ $\forall$a. tail\_len\_c\_aux (elem\#l0) a = length (elem\#l0) + a
+\\
+\\Seja a0 uma variável arbitrária
+\\Mostrar P(elem\#l0) $\triangleq$ tail\_len\_c\_aux (elem\#l0) a0 = length (elem\#l0) + a0
+\\
+\\\textit{Prova:}
+\\tail\_len\_c\_aux l0 (Suc a0) (por tail\_len\_c\_aux02)
+\\length l0 + (Suc a0) (por hipótese)
+\\length (elem\#l0) + a0 (por simplificação)
+
+\subsection{Teorema th03: tail\_len\_nc T = tail\_len\_c T}
+P $\triangleq$ tail\_len\_nc T = tail\_len\_c T
+\\P(l) $\triangleq$ tail\_len\_nc l = tail\_len\_c l
+\\
+\\\subsubsection{Base:} P([]) $\triangleq$ tail\_len\_nc [] = tail\_len\_c []
+\\
+\\\textit{Prova:}
+\\tail\_len\_nc [] = 0 (por tail\_len\_nc01)
+\\tail\_len\_c [] (por tail\_len\_c01)
+\\
+\\\subsubsection{Indução:}
+Seja T0 uma variável arbitrária
+\\Seja a0 uma variável arbitrária
+\\Assumir como hipótese P(T0) $\triangleq$ tail\_len\_nc T0 = tail\_len\_c T0
+\\Demonstrar P(a0\#T0) $\triangleq$ tail\_len\_nc (a0\#T0) = tail\_len\_c (a0\#T0)
+\\
+\\\textit{Prova:}
+\\length (a0\#T0) (por th01)
+\\= tail\_len\_c\_aux (a0\#T0) 0 (por th02)
+\\= tail\_len\_c (a0\#T0)" (por tail\_len\_c02)
+
+\end{document}
